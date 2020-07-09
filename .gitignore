@@ -1,1 +1,3 @@
 database/data
+redis-data
+redis.conf

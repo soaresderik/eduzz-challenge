@@ -1,6 +1,57 @@
 version: "3"
 
 services:
+  backend:
+    build: ./backend
+    ports:
+      - 3333:3333
+    volumes:
+      - ./backend:/app
+    environment:
+      APP_SECRET: a_big_secret_here
+      DB_HOST: db
+      DB_NAME: eduzz
+      DB_USER: postgres
+      DB_PASS: example
+      DB_PORT: 5432
+      MAIL_HOST:
+      MAIL_PORT:
+      MAIL_USER:
+      MAIL_PASS:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      URL_MERCADO_BTC: https://www.mercadobitcoin.net/api
+    networks:
+      - the_net
+    depends_on:
+      - db
+      - redis
+
+  queue:
+    build: ./backend
+    command: npm run queue
+    volumes:
+      - ./backend:/app
+    environment:
+      APP_SECRET: a_big_secret_here
+      DB_HOST: db
+      DB_NAME: eduzz
+      DB_USER: postgres
+      DB_PASS: example
+      DB_PORT: 5432
+      MAIL_HOST:
+      MAIL_PORT:
+      MAIL_USER:
+      MAIL_PASS:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      URL_MERCADO_BTC: https://www.mercadobitcoin.net/api
+    networks:
+      - the_net
+    depends_on:
+      - backend
+      - redis
+
   db:
     image: postgres:12
     restart: always
@@ -15,6 +66,17 @@ services:
       - 5434:5432
     networks:
       - the_net
+
+  redis:
+    image: "redis:5.0-alpine"
+    command: ["redis-server", "--bind", "redis", "--port", "6379"]
+    container_name: cache
+    expose:
+      - "6379"
+    networks:
+      - the_net
+    depends_on:
+      - db
 
   adminer:
     image: adminer
