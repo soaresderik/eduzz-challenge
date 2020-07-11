@@ -22,7 +22,7 @@ export default class Investment {
   @Column("int")
   purchaseCryptoPrice: number;
 
-  @ManyToOne((type) => UserEntity)
+  @ManyToOne((type) => UserEntity, { onDelete: "CASCADE" })
   @JoinColumn()
   user: UserEntity;
 

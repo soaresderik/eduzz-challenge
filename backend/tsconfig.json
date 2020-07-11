@@ -10,7 +10,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "baseUrl": "./src"
   },
   "exclude": ["node_modules", "dist"]

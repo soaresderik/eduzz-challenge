@@ -1,6 +1,6 @@
 import "reflect-metadata";
-import * as dotenv from "dotenv";
-dotenv.config();
+import { loadEnv } from "./configs/load-env.configs";
+loadEnv();
 import { useExpressServer, Action } from "routing-controllers";
 import express from "express";
 import ErrorHandler from "./middlewares/error-handler.middleware";
@@ -14,7 +14,7 @@ import * as jwt from "jsonwebtoken";
     const PORT = 3333;
     const app = express();
 
-    await connection();
+    await connection.create();
 
     app.use(express.json());
 

@@ -24,6 +24,8 @@ export default class UsersServices {
   }
 
   public async registerUser(params: RegisterDTO) {
-    return this.usersRepository.registerUser(params);
+    const user = await this.usersRepository.registerUser(params);
+    delete user.password;
+    return user;
   }
 }

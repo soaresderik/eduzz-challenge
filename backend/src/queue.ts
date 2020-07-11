@@ -1,12 +1,12 @@
-import * as dotenv from "dotenv";
-dotenv.config();
+import { loadEnv } from "./configs/load-env.configs";
+loadEnv();
 import connection from "./shared/connection.shared";
 
 import Queue from "./queues";
 
 (async () => {
   try {
-    await connection();
+    await connection.create();
 
     Queue.add("call-api", {});
 

@@ -1,15 +1,8 @@
 import mail from "../shared/mail.shared";
 
-interface MailInfo {
-  from: string;
-  to: string;
-  subject: string;
-  html: string;
-}
-
 export default {
   key: "mail",
-  async handle(data: MailInfo) {
+  async handle({ data }) {
     await mail.sendMail({
       from: data.from,
       to: data.to,

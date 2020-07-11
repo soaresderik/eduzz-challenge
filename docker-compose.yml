@@ -14,10 +14,10 @@ services:
       DB_USER: postgres
       DB_PASS: example
       DB_PORT: 5432
-      MAIL_HOST:
-      MAIL_PORT:
-      MAIL_USER:
-      MAIL_PASS:
+      MAIL_HOST: smtp.mailtrap.io
+      MAIL_PORT: 2525
+      MAIL_USER: 4f17dcbdde1b26
+      MAIL_PASS: fac87376d8f884
       REDIS_HOST: redis
       REDIS_PORT: 6379
       URL_MERCADO_BTC: https://www.mercadobitcoin.net/api
@@ -39,10 +39,10 @@ services:
       DB_USER: postgres
       DB_PASS: example
       DB_PORT: 5432
-      MAIL_HOST:
-      MAIL_PORT:
-      MAIL_USER:
-      MAIL_PASS:
+      MAIL_HOST: smtp.mailtrap.io
+      MAIL_PORT: 2525
+      MAIL_USER: 4f17dcbdde1b26
+      MAIL_PASS: fac87376d8f884
       REDIS_HOST: redis
       REDIS_PORT: 6379
       URL_MERCADO_BTC: https://www.mercadobitcoin.net/api

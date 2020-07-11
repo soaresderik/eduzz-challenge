@@ -3,6 +3,7 @@ import { UserEntity } from "../users";
 import { AccountsServices } from "../accounts";
 import HttpException from "../../exceptions/http.exception";
 import { InvestmentsRepository, InvesmentArgs } from ".";
+import Queue from "../../queues";
 
 export default class InvestmentsServices {
   constructor(
@@ -33,6 +34,24 @@ export default class InvestmentsServices {
       user,
     } as InvesmentArgs;
 
-    return this.investmentRepository.purchase(investment);
+    const result = await this.investmentRepository.purchase(investment);
+
+    // TODO: Create email template
+    Queue.add("mail", {
+      from: "Eduzz Challenge <example@example.com>",
+      to: `${user.name} <${user.email}>`,
+      subject: "Compra de Bitcoin realizada!",
+      html: `
+        <h2>Detalhes do investimento</h2>
+        <p>
+          Valor Investido: <strong> ${
+            result.purchaseAmount / 100
+          } </strong> <br/>
+          Valor em BTC: <strong> ${result.cryptoAmount} </strong>
+        </p>
+      `,
+    });
+
+    return result;
   }
 }
