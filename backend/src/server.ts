@@ -22,7 +22,7 @@ import * as jwt from "jsonwebtoken";
       controllers: [__dirname + "/modules/**/*.controller.ts"],
       middlewares: [ErrorHandler],
       defaultErrorHandler: false,
-      authorizationChecker: async (action: Action, roles: string[]) => {
+      currentUserChecker: async (action: Action) => {
         const token = action.request.headers.authorization;
 
         let user: UserEntity | null = null;
@@ -32,7 +32,7 @@ import * as jwt from "jsonwebtoken";
           user = await UserEntity.findOne(decoded.id);
         }
 
-        if (user) return true;
+        if (user) return user;
 
         return false;
       },

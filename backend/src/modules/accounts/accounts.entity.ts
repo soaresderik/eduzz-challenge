@@ -8,17 +8,19 @@ import {
   JoinColumn,
 } from "typeorm";
 import { UserEntity } from "../users";
-
-type TransactionType = "deposit" | "investment" | "liquidation";
+import { TransactionType } from ".";
 
 @Entity("accounts")
 export default class Account extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @Column("varchar")
+  userId: string;
+
   @ManyToOne((type) => UserEntity)
   @JoinColumn()
-  account: UserEntity;
+  user: UserEntity;
 
   @Column("int")
   value: number;
