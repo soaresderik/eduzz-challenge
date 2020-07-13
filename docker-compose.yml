@@ -27,6 +27,17 @@ services:
       - db
       - redis
 
+  frontend:
+    build: ./frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/app
+    networks:
+      - the_net
+    depends_on:
+      - backend
+
   queue:
     build: ./backend
     command: npm run queue
