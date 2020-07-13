@@ -1,15 +1,41 @@
-import * as React from "react";
-import { Route, RouteProps } from "react-router-dom";
+import React from "react";
+import {
+  RouteProps as ReactDOMRouteProps,
+  Route as ReactDOMRoute,
+  Redirect,
+} from "react-router-dom";
 
-type LayoutRouteProps = RouteProps & {
-  component: React.ComponentType;
+import { useAuth } from "./store/auth";
+
+interface RouteProps extends ReactDOMRouteProps {
   isPrivate?: boolean;
+  component: React.ComponentType;
+}
+
+const Route: React.FC<RouteProps> = ({
+  isPrivate = false,
+  component: Component,
+  ...rest
+}) => {
+  const { token } = useAuth();
+
+  return (
+    <ReactDOMRoute
+      {...rest}
+      render={({ location }) => {
+        return isPrivate === !!token ? (
+          <Component />
+        ) : (
+          <Redirect
+            to={{
+              pathname: isPrivate ? "/login" : "/dashboard",
+              state: { from: location },
+            }}
+          />
+        );
+      }}
+    />
+  );
 };
 
-const RouteWrapper = ({ component, isPrivate, ...rest }: LayoutRouteProps) => {
-  const Component = component;
-
-  return <Route {...rest} render={(props) => <Component {...props} />} />;
-};
-
-export default RouteWrapper;
+export default Route;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, SyntheticEvent } from "react";
 import {
   Container,
   Avatar,
@@ -11,8 +11,30 @@ import { LockOpenOutlined } from "@material-ui/icons";
 import { loginStyled } from "./styles";
 import { Link } from "react-router-dom";
 
+import { useAuth } from "../store/auth";
+
 export default function Login() {
   const classes = loginStyled();
+  const [data, setData] = useState(() => ({
+    email: "",
+    password: "",
+  }));
+
+  const { login } = useAuth();
+
+  const handleChange = (e: SyntheticEvent) => {
+    e.preventDefault();
+    const target = e.target as HTMLInputElement;
+    setData((inputs) => ({
+      ...inputs,
+      [target.name]: target.value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    await login({ email: data.email, password: data.password });
+  };
+
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
@@ -22,7 +44,7 @@ export default function Login() {
         <Typography component="h1" variant="h5">
           Entre com sua conta
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -33,6 +55,7 @@ export default function Login() {
             name="email"
             autoComplete="email"
             autoFocus
+            onChange={handleChange}
           />
           <TextField
             variant="outlined"
@@ -44,13 +67,14 @@ export default function Login() {
             type="password"
             id="password"
             autoComplete="current-password"
+            onChange={handleChange}
           />
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={handleSubmit}
           >
             ENTRAR
           </Button>

@@ -1,7 +1,11 @@
 import "./App.css";
+import "react-toastify/dist/ReactToastify.css";
 import React from "react";
 import { HashRouter as Router, Switch } from "react-router-dom";
 import Route from "./Route";
+import { ToastContainer, toast } from "react-toastify";
+
+import AppProvider from "./store";
 
 import GlobalStyle from "./global-style";
 import Login from "./pages/Login";
@@ -12,12 +16,15 @@ function App() {
   return (
     <>
       <Router>
-        <Switch>
-          <Route path="/login" exact component={Login} />
-          <Route path="/register" component={Register} />
-          <Route path="/dashboard" component={Dashboard} />
-        </Switch>
+        <AppProvider>
+          <Switch>
+            <Route path="/login" exact component={Login} />
+            <Route path="/register" component={Register} />
+            <Route path="/dashboard" component={Dashboard} isPrivate />
+          </Switch>
+        </AppProvider>
       </Router>
+      <ToastContainer />
       <GlobalStyle />
     </>
   );
