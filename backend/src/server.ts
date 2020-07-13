@@ -8,6 +8,7 @@ import connection from "./shared/connection.shared";
 import { UserEntity } from "./modules/users";
 import authConfigs from "./configs/auth.configs";
 import * as jwt from "jsonwebtoken";
+import cors from "cors";
 
 (async () => {
   try {
@@ -17,6 +18,7 @@ import * as jwt from "jsonwebtoken";
     await connection.create();
 
     app.use(express.json());
+    app.use(cors());
 
     useExpressServer(app, {
       controllers: [__dirname + "/modules/**/*.controller.ts"],
