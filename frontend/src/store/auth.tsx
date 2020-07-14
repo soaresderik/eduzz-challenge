@@ -18,7 +18,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
-    const token = localStorage.getItem("token");
+    const token = AuthService.getAccessToken();
 
     if (token) {
       return {
@@ -42,6 +42,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       const response = await AuthService.login({ email, password });
 
       const { token } = response.data;
+      AuthService.saveToken(token);
 
       setData({ token });
     } catch (err) {

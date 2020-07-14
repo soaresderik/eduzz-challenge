@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -10,37 +10,19 @@ import {
 import { DashContainer } from "./styles";
 import Chart from "react-apexcharts";
 import { formatPrice } from "../utils/currency";
+import { useMain } from "../store/main";
 
 export default function Dashboard() {
+  const { getBalance, getHistory, balance, history } = useMain();
+
+  useEffect(() => {
+    (async () => {
+      await getBalance();
+      await getHistory();
+    })();
+  }, [getBalance, getHistory]);
+
   const [chart, setChart] = useState({
-    series: [
-      {
-        name: "Compra",
-        data: [
-          2809000,
-          3900500,
-          431000,
-          960020,
-          7203000,
-          9203000,
-          8306000,
-          8306100,
-        ],
-      },
-      {
-        name: "Venda",
-        data: [
-          1200000,
-          2100000,
-          5402300,
-          3050800,
-          4907000,
-          7230000,
-          8900000,
-          8306100,
-        ],
-      },
-    ],
     options: {
       chart: {
         type: "line",
@@ -77,6 +59,9 @@ export default function Dashboard() {
         title: {
           text: "24h",
         },
+        labels: {
+          show: false,
+        },
         tickAmount: 5,
       },
       yaxis: {
@@ -88,8 +73,6 @@ export default function Dashboard() {
             return formatPrice(value / 100);
           },
         },
-        min: 100000,
-        max: 10000000,
         tickAmount: 6,
       },
       legend: {
@@ -125,7 +108,7 @@ export default function Dashboard() {
                 <Typography color="textSecondary" gutterBottom>
                   Seu saldo
                 </Typography>
-                <h2>R$ 1.238,00</h2>
+                <h2>{balance}</h2>
               </CardContent>
             </Card>
           </Grid>
@@ -196,11 +179,9 @@ export default function Dashboard() {
         <Grid item xs={12} md={7}>
           <Card>
             <CardContent>
-              <Chart
-                options={chart.options}
-                series={chart.series}
-                type="line"
-              />
+              {history.length && (
+                <Chart options={chart.options} series={history} type="line" />
+              )}
             </CardContent>
           </Card>
         </Grid>
