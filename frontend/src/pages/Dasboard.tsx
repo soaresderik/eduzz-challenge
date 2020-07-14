@@ -11,18 +11,30 @@ import { DashContainer } from "./styles";
 import Chart from "react-apexcharts";
 import { formatPrice } from "../utils/currency";
 import { useMain } from "../store/main";
+import { useAuth } from "../store/auth";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 export default function Dashboard() {
-  const { getBalance, getHistory, balance, history } = useMain();
+  const {
+    getBalance,
+    getHistory,
+    currentPrice,
+    balance,
+    history,
+    price,
+  } = useMain();
+
+  const { logout } = useAuth();
 
   useEffect(() => {
     (async () => {
       await getBalance();
       await getHistory();
+      await currentPrice();
     })();
-  }, [getBalance, getHistory]);
+  }, [getBalance, getHistory, currentPrice]);
 
-  const [chart, setChart] = useState({
+  const [chart] = useState({
     options: {
       chart: {
         type: "line",
@@ -85,8 +97,29 @@ export default function Dashboard() {
     },
   });
 
+  function handleLogout() {
+    logout();
+  }
+
   return (
     <DashContainer maxWidth="md">
+      <Grid
+        container
+        spacing={4}
+        direction="row"
+        justify="space-between"
+        alignItems="center"
+      >
+        <Grid item>
+          <h1>Dashboard</h1>
+        </Grid>
+        <Grid item>
+          <Button onClick={handleLogout}>
+            <ExitToAppIcon />
+          </Button>
+        </Grid>
+      </Grid>
+
       <Grid
         container
         spacing={4}
@@ -129,13 +162,13 @@ export default function Dashboard() {
                     <Typography color="textSecondary" gutterBottom>
                       Compra
                     </Typography>
-                    <h3 style={{ color: "#00c708" }}>R$ 1.238,00</h3>
+                    <h3 style={{ color: "#00c708" }}>{price.buy}</h3>
                   </Grid>
                   <Grid item>
                     <Typography color="textSecondary" gutterBottom>
                       Venda
                     </Typography>
-                    <h3 style={{ color: "#e80000" }}>R$ 1.238,00</h3>
+                    <h3 style={{ color: "#e80000" }}>{price.sell}</h3>
                   </Grid>
                 </Grid>
               </CardContent>

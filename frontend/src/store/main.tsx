@@ -7,13 +7,16 @@ import { formatPrice } from "../utils/currency";
 interface MainContextData {
   balance: string;
   history: { name: string; data: number[] }[];
+  price: { buy: string; sell: string };
   getBalance(): Promise<void>;
   getHistory(): Promise<void>;
+  currentPrice(): Promise<void>;
 }
 
 interface MainState {
   balance: string;
   history: { name: string; data: number[] }[];
+  price: { buy: string; sell: string };
 }
 
 const MainContext = createContext<MainContextData>({} as MainContextData);
@@ -26,6 +29,7 @@ export const MainProvider: React.FC = ({ children }) => {
         { name: "compra", data: [0] },
         { name: "venda", data: [0] },
       ],
+      price: { buy: "", sell: "" },
     };
   });
 
@@ -38,7 +42,7 @@ export const MainProvider: React.FC = ({ children }) => {
         balance: formatPrice(data.amount / 100),
       }));
     } catch (err) {
-      if (err?.response.data) {
+      if (err?.response?.data) {
         toast.error(err?.response.data.message);
         return;
       }
@@ -69,13 +73,35 @@ export const MainProvider: React.FC = ({ children }) => {
     }
   }, []);
 
+  const currentPrice = useCallback(async () => {
+    try {
+      const { data } = await MainService.currentPrice();
+
+      setData((state) => ({
+        ...state,
+        price: {
+          buy: formatPrice(data.buy / 100),
+          sell: formatPrice(data.sell / 100),
+        },
+      }));
+    } catch (err) {
+      if (err?.response.data) {
+        toast.error(err?.response.data.message);
+        return;
+      }
+      toast.error("Erro ao tentar buscar valor atual do bitcoin.");
+    }
+  }, []);
+
   return (
     <MainContext.Provider
       value={{
         balance: data.balance,
         history: data.history,
+        price: data.price,
         getBalance,
         getHistory,
+        currentPrice,
       }}
     >
       {children}

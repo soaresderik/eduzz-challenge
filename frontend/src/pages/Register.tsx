@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, SyntheticEvent } from "react";
 import {
   Container,
   Avatar,
@@ -10,9 +10,40 @@ import {
 import { LockOpenOutlined } from "@material-ui/icons";
 import { loginStyled } from "./styles";
 import { Link } from "react-router-dom";
+import { useAuth } from "../store/auth";
+import { useHistory } from "react-router-dom";
 
 export default function Register() {
   const classes = loginStyled();
+  const history = useHistory();
+
+  const [data, setData] = useState(() => ({
+    name: "",
+    email: "",
+    password: "",
+  }));
+
+  const { register } = useAuth();
+
+  async function handleRegister() {
+    const res = await register({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    });
+
+    if (res) history.push("/dashboard");
+  }
+
+  function handleChange(e: SyntheticEvent) {
+    e.preventDefault();
+    const target = e.target as HTMLInputElement;
+    setData((inputs) => ({
+      ...inputs,
+      [target.name]: target.value,
+    }));
+  }
+
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
@@ -31,8 +62,9 @@ export default function Register() {
             id="name"
             label="Seu nome completo"
             name="name"
-            autoComplete="email"
+            autoComplete="name"
             autoFocus
+            onChange={handleChange}
           />
           <TextField
             variant="outlined"
@@ -44,6 +76,7 @@ export default function Register() {
             name="email"
             autoComplete="email"
             autoFocus
+            onChange={handleChange}
           />
           <TextField
             variant="outlined"
@@ -54,14 +87,14 @@ export default function Register() {
             label="Sua senha"
             type="password"
             id="password"
-            autoComplete="current-password"
+            onChange={handleChange}
           />
           <Button
-            type="submit"
             fullWidth
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={handleRegister}
           >
             CADASTRAR
           </Button>

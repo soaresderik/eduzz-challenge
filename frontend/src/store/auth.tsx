@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 interface AuthContextData {
   token: string;
   login(params: IAuthenticate): Promise<void>;
-  register(params: IRegister): Promise<void>;
+  register(params: IRegister): Promise<boolean>;
   logout(): void;
 }
 
@@ -29,12 +29,19 @@ export const AuthProvider: React.FC = ({ children }) => {
     return {} as AuthState;
   });
 
-  const register = useCallback(async ({ email, password }) => {
-    const response = await AuthService.login({ email, password });
+  const register = useCallback(async ({ name, email, password }) => {
+    try {
+      await AuthService.register({ name, email, password });
 
-    const { token } = response.data;
-
-    setData({ token });
+      return true;
+    } catch (err) {
+      if (err?.response.data) {
+        toast.error(err?.response.data.message);
+        return false;
+      }
+      toast.error("Erro ao tentar realizar login!");
+      return false;
+    }
   }, []);
 
   const login = useCallback(async ({ email, password }) => {

@@ -13,6 +13,12 @@ class MainService extends BaseHttpService {
       AxiosResponse<{ buy: number; sell: number }[]>
     >;
   }
+
+  async currentPrice() {
+    return this.get("investments/current-price") as Promise<
+      AxiosResponse<{ buy: number; sell: number }>
+    >;
+  }
 }
 
 export default new MainService();
