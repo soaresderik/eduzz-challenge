@@ -19,10 +19,28 @@ export default function Dashboard() {
     getBalance,
     getHistory,
     currentPrice,
+    deposit,
+    purchaseBTC,
     balance,
     history,
     price,
   } = useMain();
+
+  const [toDeposit, setToDeposit] = useState<{
+    stringValue: string;
+    value: number;
+  }>({
+    stringValue: "R$ 0,00",
+    value: 0,
+  });
+
+  const [purchase, setPurchase] = useState<{
+    stringValue: string;
+    value: number;
+  }>({
+    stringValue: "R$ 0,00",
+    value: 0,
+  });
 
   const { logout } = useAuth();
 
@@ -99,6 +117,38 @@ export default function Dashboard() {
 
   function handleLogout() {
     logout();
+  }
+
+  function convertDeposit(value: string) {
+    const amount = +value.replace(/\D/g, "");
+
+    console.log({ amount, format: formatPrice(amount / 100) });
+
+    if (amount > 100000000) return;
+
+    setToDeposit({ stringValue: formatPrice(amount / 100), value: amount });
+  }
+
+  function convertPurchase(value: string) {
+    const amount = +value.replace(/\D/g, "");
+
+    console.log({ amount, format: formatPrice(amount / 100) });
+
+    if (amount > 100000000) return;
+
+    setPurchase({ stringValue: formatPrice(amount / 100), value: amount });
+  }
+
+  async function handleDeposit() {
+    await deposit(toDeposit.value);
+
+    setToDeposit({ stringValue: "R$ 0,00", value: 0 });
+  }
+
+  async function handlePurchase() {
+    await purchaseBTC(purchase.value);
+
+    setPurchase({ stringValue: "R$ 0,00", value: 0 });
   }
 
   return (
@@ -187,8 +237,14 @@ export default function Dashboard() {
                     label="Comprar BTC"
                     variant="outlined"
                     size="small"
+                    value={purchase.stringValue}
+                    onChange={(e) => convertPurchase(e.target.value)}
                   />
-                  <Button variant="outlined" size="large">
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={handlePurchase}
+                  >
                     ENVIAR
                   </Button>
                 </div>
@@ -199,8 +255,14 @@ export default function Dashboard() {
                     label="Depositar em conta"
                     variant="outlined"
                     size="small"
+                    value={toDeposit.stringValue}
+                    onChange={(e) => convertDeposit(e.target.value)}
                   />
-                  <Button variant="outlined" size="large">
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={handleDeposit}
+                  >
                     ENVIAR
                   </Button>
                 </div>

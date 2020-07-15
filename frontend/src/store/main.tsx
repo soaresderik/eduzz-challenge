@@ -11,6 +11,8 @@ interface MainContextData {
   getBalance(): Promise<void>;
   getHistory(): Promise<void>;
   currentPrice(): Promise<void>;
+  deposit(amount: number): Promise<void>;
+  purchaseBTC(amount: number): Promise<void>;
 }
 
 interface MainState {
@@ -93,6 +95,40 @@ export const MainProvider: React.FC = ({ children }) => {
     }
   }, []);
 
+  const deposit = useCallback(async (amount: number) => {
+    try {
+      await MainService.deposit(amount);
+      await getBalance();
+
+      toast.success(
+        `Deposito de ${formatPrice(amount / 100)} realizado com sucesso!`
+      );
+    } catch (err) {
+      if (err?.response.data) {
+        toast.error(err?.response.data.message);
+        return;
+      }
+      toast.error("Erro ao tentar realizar deposito.");
+    }
+  }, []);
+
+  const purchaseBTC = useCallback(async (amount: number) => {
+    try {
+      const { data } = await MainService.purchaseBTC(amount);
+      await getBalance();
+
+      toast.success(
+        `Compra realizada com sucesso! Você comprou ${data.cryptoAmount} em BTC.`
+      );
+    } catch (err) {
+      if (err?.response.data) {
+        toast.error(err?.response.data.message);
+        return;
+      }
+      toast.error("Erro ao tentar realizar compra.");
+    }
+  }, []);
+
   return (
     <MainContext.Provider
       value={{
@@ -102,6 +138,8 @@ export const MainProvider: React.FC = ({ children }) => {
         getBalance,
         getHistory,
         currentPrice,
+        deposit,
+        purchaseBTC,
       }}
     >
       {children}
