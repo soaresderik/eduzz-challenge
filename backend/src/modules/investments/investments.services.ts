@@ -54,4 +54,34 @@ export default class InvestmentsServices {
 
     return result;
   }
+
+  public async position(user: UserEntity) {
+    try {
+      const investments = await this.investmentRepository._db.find({
+        where: {
+          user,
+        },
+        order: {
+          createdAt: "DESC",
+        },
+      });
+
+      const { buy: currentCryptoPrice } = await this.getCurrentPrice();
+
+      return investments.map((i) => ({
+        id: i.id,
+        purchaseCryptoPrice: i.purchaseCryptoPrice,
+        currentCryptoPrice,
+        cryptoAmount: +i.cryptoAmount,
+        purchaseAmount: i.purchaseAmount,
+        variation: currentCryptoPrice / i.purchaseCryptoPrice,
+        purchasedDate: i.createdAt,
+      }));
+    } catch (err) {
+      throw new HttpException(
+        err.status || 500,
+        err.message || "Erro interno!"
+      );
+    }
+  }
 }

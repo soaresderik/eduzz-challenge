@@ -18,3 +18,13 @@ export interface PurchaseResponse {
   purchaseCryptoPrice: number;
   createdAt: Date;
 }
+
+export interface PositionResponse {
+  id: string;
+  purchaseCryptoPrice: number;
+  currentCryptoPrice: number;
+  cryptoAmount: number;
+  purchaseAmount: number;
+  variation: number;
+  purchasedDate: string;
+}

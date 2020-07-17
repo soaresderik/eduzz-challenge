@@ -14,13 +14,17 @@ import { useMain } from "../store/main";
 import { useAuth } from "../store/auth";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
+import PositionCard from "../components/PositionCard";
+
 export default function Dashboard() {
   const {
     getBalance,
     getHistory,
+    getPosition,
     currentPrice,
     deposit,
     purchaseBTC,
+    position,
     balance,
     history,
     price,
@@ -49,8 +53,9 @@ export default function Dashboard() {
       await getBalance();
       await getHistory();
       await currentPrice();
+      await getPosition();
     })();
-  }, [getBalance, getHistory, currentPrice]);
+  }, []);
 
   const [chart] = useState({
     options: {
@@ -271,14 +276,32 @@ export default function Dashboard() {
           </Grid>
         </Grid>
 
-        <Grid item xs={12} md={7}>
-          <Card>
-            <CardContent>
-              {history.length && (
-                <Chart options={chart.options} series={history} type="line" />
-              )}
-            </CardContent>
-          </Card>
+        <Grid
+          xs={12}
+          md={7}
+          item
+          direction="column"
+          justify="center"
+          alignItems="stretch"
+        >
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                {history.length && (
+                  <Chart options={chart.options} series={history} type="line" />
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+          <br />
+          <Grid item xs={12}>
+            <h2>Seus investimentos</h2>
+            {!position.length ? (
+              <p> Você ainda não tem investimentos</p>
+            ) : (
+              position.map((i) => <PositionCard key={i.id} position={i} />)
+            )}
+          </Grid>
         </Grid>
       </Grid>
     </DashContainer>

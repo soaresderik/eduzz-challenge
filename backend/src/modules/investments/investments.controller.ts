@@ -24,4 +24,10 @@ export default class InvestmentsController {
 
     return this.investmentsService.purchase(amount, user);
   }
+
+  @Get("/position")
+  public async position(@CurrentUser() user?) {
+    checkAuth(user);
+    return this.investmentsService.position(user);
+  }
 }

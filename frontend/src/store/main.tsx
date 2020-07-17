@@ -4,21 +4,28 @@ import { MainService } from "../services";
 import { toast } from "react-toastify";
 import { formatPrice } from "../utils/currency";
 
-interface MainContextData {
-  balance: string;
-  history: { name: string; data: number[] }[];
-  price: { buy: string; sell: string };
-  getBalance(): Promise<void>;
-  getHistory(): Promise<void>;
-  currentPrice(): Promise<void>;
-  deposit(amount: number): Promise<void>;
-  purchaseBTC(amount: number): Promise<void>;
-}
-
 interface MainState {
   balance: string;
   history: { name: string; data: number[] }[];
   price: { buy: string; sell: string };
+  position: {
+    id: string;
+    purchaseCryptoPrice: number;
+    currentCryptoPrice: number;
+    cryptoAmount: number;
+    purchaseAmount: number;
+    variation: number;
+    purchasedDate: string;
+  }[];
+}
+
+interface MainContextData extends MainState {
+  getBalance(): Promise<void>;
+  getHistory(): Promise<void>;
+  getPosition(): Promise<void>;
+  currentPrice(): Promise<void>;
+  deposit(amount: number): Promise<void>;
+  purchaseBTC(amount: number): Promise<void>;
 }
 
 const MainContext = createContext<MainContextData>({} as MainContextData);
@@ -32,6 +39,7 @@ export const MainProvider: React.FC = ({ children }) => {
         { name: "venda", data: [0] },
       ],
       price: { buy: "", sell: "" },
+      position: [],
     };
   });
 
@@ -67,7 +75,7 @@ export const MainProvider: React.FC = ({ children }) => {
         ],
       }));
     } catch (err) {
-      if (err?.response.data) {
+      if (err?.response?.data) {
         toast.error(err?.response.data.message);
         return;
       }
@@ -87,7 +95,7 @@ export const MainProvider: React.FC = ({ children }) => {
         },
       }));
     } catch (err) {
-      if (err?.response.data) {
+      if (err?.response?.data) {
         toast.error(err?.response.data.message);
         return;
       }
@@ -109,6 +117,31 @@ export const MainProvider: React.FC = ({ children }) => {
         return;
       }
       toast.error("Erro ao tentar realizar deposito.");
+    }
+  }, []);
+
+  const getPosition = useCallback(async () => {
+    try {
+      const { data } = await MainService.getPosition();
+
+      setData((state) => ({
+        ...state,
+        position: data.map((i) => ({
+          id: i.id,
+          purchaseCryptoPrice: i.purchaseCryptoPrice,
+          currentCryptoPrice: i.currentCryptoPrice,
+          cryptoAmount: i.cryptoAmount,
+          purchaseAmount: i.purchaseAmount,
+          variation: i.variation * 100,
+          purchasedDate: i.purchasedDate,
+        })),
+      }));
+    } catch (err) {
+      if (err?.response?.data) {
+        toast.error(err?.response.data.message);
+        return;
+      }
+      toast.error("Erro ao tentar buscar posição de investimentos.");
     }
   }, []);
 
@@ -135,6 +168,8 @@ export const MainProvider: React.FC = ({ children }) => {
         balance: data.balance,
         history: data.history,
         price: data.price,
+        position: data.position,
+        getPosition,
         getBalance,
         getHistory,
         currentPrice,
