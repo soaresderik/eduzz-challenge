@@ -28,3 +28,10 @@ export interface PositionResponse {
   variation: number;
   purchasedDate: string;
 }
+
+export interface ExtractResponse {
+  id: string;
+  value: number;
+  type: string;
+  createdAt: string;
+}

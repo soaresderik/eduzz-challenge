@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext, useCallback } from "react";
 import { MainService } from "../services";
 import { toast } from "react-toastify";
 import { formatPrice } from "../utils/currency";
+import { format } from "date-fns";
 
 interface MainState {
   balance: string;
@@ -17,12 +18,19 @@ interface MainState {
     variation: number;
     purchasedDate: string;
   }[];
+  extract: {
+    id: string;
+    value: string;
+    type: string;
+    createdAt: string;
+  }[];
 }
 
 interface MainContextData extends MainState {
   getBalance(): Promise<void>;
   getHistory(): Promise<void>;
   getPosition(): Promise<void>;
+  getExtract(): Promise<void>;
   currentPrice(): Promise<void>;
   deposit(amount: number): Promise<void>;
   purchaseBTC(amount: number): Promise<void>;
@@ -40,6 +48,7 @@ export const MainProvider: React.FC = ({ children }) => {
       ],
       price: { buy: "", sell: "" },
       position: [],
+      extract: [],
     };
   });
 
@@ -50,6 +59,23 @@ export const MainProvider: React.FC = ({ children }) => {
       setData((state) => ({
         ...state,
         balance: formatPrice(data.amount / 100),
+      }));
+    } catch (err) {
+      if (err?.response?.data) {
+        toast.error(err?.response.data.message);
+        return;
+      }
+      toast.error("Erro ao tentar buscar saldo.");
+    }
+  }, []);
+
+  const getExtract = useCallback(async () => {
+    try {
+      const { data } = await MainService.getExtract();
+
+      setData((state) => ({
+        ...state,
+        extract: data.map((i) => ({ ...i, value: formatPrice(i.value / 100) })),
       }));
     } catch (err) {
       if (err?.response?.data) {
@@ -107,6 +133,7 @@ export const MainProvider: React.FC = ({ children }) => {
     try {
       await MainService.deposit(amount);
       await getBalance();
+      await getExtract();
 
       toast.success(
         `Deposito de ${formatPrice(amount / 100)} realizado com sucesso!`
@@ -133,7 +160,7 @@ export const MainProvider: React.FC = ({ children }) => {
           cryptoAmount: i.cryptoAmount,
           purchaseAmount: i.purchaseAmount,
           variation: i.variation * 100,
-          purchasedDate: i.purchasedDate,
+          purchasedDate: format(new Date(i.purchasedDate), "dd/mm/yyyy"),
         })),
       }));
     } catch (err) {
@@ -149,6 +176,8 @@ export const MainProvider: React.FC = ({ children }) => {
     try {
       const { data } = await MainService.purchaseBTC(amount);
       await getBalance();
+      await getPosition();
+      await getExtract();
 
       toast.success(
         `Compra realizada com sucesso! Você comprou ${data.cryptoAmount} em BTC.`
@@ -169,6 +198,8 @@ export const MainProvider: React.FC = ({ children }) => {
         history: data.history,
         price: data.price,
         position: data.position,
+        extract: data.extract,
+        getExtract,
         getPosition,
         getBalance,
         getHistory,

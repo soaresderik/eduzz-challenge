@@ -16,4 +16,21 @@ export default class AccountsServices {
   ) {
     return this.accountsRepository.transaction(user, amount, type);
   }
+
+  public async getExtract(user: UserEntity) {
+    const extract = await this.accountsRepository._db.find({
+      where: {
+        user,
+      },
+      order: {
+        createdAt: "DESC",
+      },
+    });
+    return extract.map((i) => ({
+      id: i.id,
+      value: i.value,
+      type: i.transactionType,
+      createdAt: i.createdAt,
+    }));
+  }
 }

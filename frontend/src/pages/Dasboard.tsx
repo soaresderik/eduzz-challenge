@@ -15,10 +15,12 @@ import { useAuth } from "../store/auth";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 import PositionCard from "../components/PositionCard";
+import ListExtract from "../components/ListExtract";
 
 export default function Dashboard() {
   const {
     getBalance,
+    getExtract,
     getHistory,
     getPosition,
     currentPrice,
@@ -28,6 +30,7 @@ export default function Dashboard() {
     balance,
     history,
     price,
+    extract,
   } = useMain();
 
   const [toDeposit, setToDeposit] = useState<{
@@ -54,6 +57,7 @@ export default function Dashboard() {
       await getHistory();
       await currentPrice();
       await getPosition();
+      await getExtract();
     })();
   }, []);
 
@@ -271,6 +275,15 @@ export default function Dashboard() {
                     ENVIAR
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+          </Grid>
+          <br />
+          <Grid item xs={12}>
+            <h2>Extrato</h2>
+            <Card>
+              <CardContent>
+                <ListExtract extract={extract} />
               </CardContent>
             </Card>
           </Grid>

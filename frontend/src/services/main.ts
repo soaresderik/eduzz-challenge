@@ -1,11 +1,21 @@
 import BaseHttpService from "./http-base";
 import { AxiosResponse } from "axios";
-import { PurchaseResponse, PositionResponse } from "./interfaces";
+import {
+  PurchaseResponse,
+  PositionResponse,
+  ExtractResponse,
+} from "./interfaces";
 
 class MainService extends BaseHttpService {
   async balance() {
     return this.get("accounts/balance") as Promise<
       AxiosResponse<{ amount: number }>
+    >;
+  }
+
+  async getExtract() {
+    return this.get("accounts/extract") as Promise<
+      AxiosResponse<ExtractResponse[]>
     >;
   }
 

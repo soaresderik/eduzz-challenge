@@ -13,6 +13,12 @@ export default class AccountsController {
     return this.accountsService.getBalance(user);
   }
 
+  @Get("/extract")
+  public async getExtract(@CurrentUser() user?) {
+    checkAuth(user);
+    return this.accountsService.getExtract(user);
+  }
+
   @Post("/deposit")
   public async deposit(@Body() { amount }, @CurrentUser() user?) {
     checkAuth(user);
